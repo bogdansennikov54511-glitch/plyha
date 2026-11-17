@@ -28,12 +28,13 @@ jobs:
         run: |
           xcodebuild clean build \
             -project DomikPlyukha.xcodeproj \
-            -target DomikPlyukha \
+            -scheme DomikPlyukha \
             -sdk iphoneos \
             -destination "generic/platform=iOS" \
             -configuration Release \
             -derivedDataPath build \
-            CODE_SIGN_IDENTITY="-" \
+            SUPPORTED_PLATFORMS="iphoneos" \
+            CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             AD_HOC_CODE_SIGNING_ALLOWED=YES
@@ -41,7 +42,8 @@ jobs:
       - name: Package into .ipa for Sideloadly
         run: |
           mkdir -p Payload
-          cp -r build/Build/Products/Release-iphoneos/DomikPlyukha.app Payload/
+          APP_PATH=$(find build -name "DomikPlyukha.app" -type d | head -n 1)
+          cp -r "$APP_PATH" Payload/
           zip -r Plyukh_iOS_v7.1.ipa Payload
 
       - name: Upload Ready IPA Artifact
