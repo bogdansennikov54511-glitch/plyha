@@ -1,0 +1,43 @@
+name: Build Plyukh iOS IPA
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
+      - name: Build Unsigned iOS App
+        run: |
+          xcodebuild clean build \
+            -project DomikPlyukha.xcodeproj \
+            -scheme DomikPlyukha \
+            -sdk iphoneos \
+            -configuration Release \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package into .ipa for Sideloadly
+        run: |
+          mkdir -p Payload
+          cp -r build/Build/Products/Release-iphoneos/DomikPlyukha.app Payload/
+          zip -r Plyukh_iOS_v7.1.ipa Payload
+
+      - name: Upload Ready IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Plyukh_iOS_IPA
+          path: Plyukh_iOS_v7.1.ipa

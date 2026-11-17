@@ -1,0 +1,34 @@
+name: DomikPlyukha
+options:
+  bundleIdPrefix: com.streetbro
+  deploymentTarget:
+    iOS: "17.0"
+targets:
+  DomikPlyukha:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.streetbro.plyukh
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_CFBundleDisplayName: "Домик Плюха"
+        MARKETING_VERSION: "7.1"
+        CURRENT_PROJECT_VERSION: "12"
+    dependencies:
+      - target: DomikPlyukhaWidgetExtension
+        embed: true
+
+  DomikPlyukhaWidgetExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - Widget
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.streetbro.plyukh.widget
+        INFOPLIST_FILE: Widget/Info.plist
+        MARKETING_VERSION: "7.1"
+        CURRENT_PROJECT_VERSION: "12"
