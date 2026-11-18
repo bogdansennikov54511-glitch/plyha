@@ -28,20 +28,9 @@ jobs:
         run: |
           xcodebuild build \
             -project DomikPlyukha.xcodeproj \
-            -target DomikPlyukhaWidgetExtension \
+            -scheme DomikPlyukha \
             -sdk iphoneos \
-            -configuration Release \
-            -derivedDataPath build \
-            SUPPORTED_PLATFORMS="iphoneos" \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES || true
-
-          xcodebuild build \
-            -project DomikPlyukha.xcodeproj \
-            -target DomikPlyukha \
-            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
             -configuration Release \
             -derivedDataPath build \
             SUPPORTED_PLATFORMS="iphoneos" \
@@ -52,76 +41,7 @@ jobs:
 
       - name: Ensure Info.plist & Package into .ipa
         run: |
-          APP_PATH=$(find build/Build/Products -name "DomikPlyukha.app" -type d | head -n 1)
-          WIDGET_PATH=$(find build/Build/Products -name "DomikPlyukhaWidgetExtension.appex" -type d | head -n 1)
-
-          if [ ! -f "$APP_PATH/Info.plist" ]; then
-            cat << 'EOF' > "$APP_PATH/Info.plist"
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>CFBundleDevelopmentRegion</key>
-            <string>ru</string>
-            <key>CFBundleDisplayName</key>
-            <string>Домик Плюха</string>
-            <key>CFBundleExecutable</key>
-            <string>DomikPlyukha</string>
-            <key>CFBundleIdentifier</key>
-            <string>com.streetbro.domikplyukha</string>
-            <key>CFBundleInfoDictionaryVersion</key>
-            <string>6.0</string>
-            <key>CFBundleName</key>
-            <string>DomikPlyukha</string>
-            <key>CFBundlePackageType</key>
-            <string>APPL</string>
-            <key>CFBundleShortVersionString</key>
-            <string>7.1</string>
-            <key>CFBundleVersion</key>
-            <string>12</string>
-            <key>LSRequiresIPhoneOS</key>
-            <true/>
-            <key>UIApplicationSceneManifest</key>
-            <dict>
-              <key>UIApplicationSupportsMultipleScenes</key>
-              <false/>
-            </dict>
-            <key>UILaunchScreen</key>
-            <dict/>
-            <key>UIRequiredDeviceCapabilities</key>
-            <array>
-              <string>arm64</string>
-            </array>
-            <key>UISupportedInterfaceOrientations</key>
-            <array>
-              <string>UIInterfaceOrientationPortrait</string>
-            </array>
-            <key>MinimumOSVersion</key>
-            <string>16.0</string>
-            <key>UIDeviceFamily</key>
-            <array>
-              <integer>1</integer>
-              <integer>2</integer>
-            </array>
-          </dict>
-          </plist>
-          EOF
-            plutil -convert binary1 "$APP_PATH/Info.plist"
-          fi
-
-          mkdir -p "$APP_PATH/PlugIns"
-          if [ -n "$WIDGET_PATH" ]; then
-            cp -rf "$WIDGET_PATH" "$APP_PATH/PlugIns/"
-            codesign --force --sign - --timestamp=none "$APP_PATH/PlugIns/DomikPlyukhaWidgetExtension.appex"
-          fi
-          codesign --force --sign - --timestamp=none "$APP_PATH"
-
-          mkdir -p Payload
-          cp -r "$APP_PATH" Payload/
-          zip -r Plyukh_iOS_v7.1.ipa Payload
-
-      - name: Upload Ready IPA Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Plyukh_iOS_IPA
-          path: Plyukh_iOS_v7.1.ipa
+          APP_PATH=$(find build -name "DomikPlyukha.app" -type d | head -n 1)
+          WIDGET_PATH=$(find build -name "DomikPlyukhaWidgetExtension.appex" -type d | head -n 1)
+          echo "Found APP_PATH: $APP_PATH"
+          echo "Found WIDGET_PATH: $WIDGET_PATH"
